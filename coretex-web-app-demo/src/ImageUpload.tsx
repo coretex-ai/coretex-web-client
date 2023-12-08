@@ -9,6 +9,9 @@ interface ImageUploadProps {
 
 const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [modelID, setModelID] = useState<number>(34);
+  const [nodeIP, setNodeIP] = useState<string>("http://130.60.24.196:21000");
+//   const [nodeIP, setNodeIP] = useState<string>("http://192.168.136.138:21000");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -24,33 +27,8 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
     formData.append('image', selectedImage);
     console.log(selectedImage);
 
-    // const axios = require('axios');
-    // const FormData = require('form-data');
-    // const fs = require('fs');
-    // let data = new FormData();
-    // data.append('refresh_token', 'f3addd06909d3d9050eb1e8c5c117897482430679765f572d0b42cc1150b34f277852277aed78cbc3bb829d5b8646e2facb99c29d7acd9ea67d22e086a708ba2');
-    // data.append('image', fs.createReadStream('/Users/duskomirkovic/Downloads/preis-gueltigkeit.jpg'));
-    // data.append('async', 'true');
-    // let config = {
-    // method: 'post',
-    // maxBodyLength: Infinity,
-    // url: 'http://localhost:21000/invoke/3886',
-    // headers: { 
-    //     ...data.getHeaders()
-    // },
-    // data : data
-    // };
-    // axios.request(config)
-    // .then((response) => {
-    // console.log(JSON.stringify(response.data));
-    // })
-    // .catch((error) => {
-    // console.log(error);
-    // });
-
-
     try {
-      const response = await axios.post('http://192.168.136.163:21000/invoke/3902', formData, {
+      const response = await axios.post(`${nodeIP}/invoke/${modelID}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

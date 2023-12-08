@@ -2,6 +2,9 @@
 import React, { useState, FC } from 'react';
 import axios from 'axios';
 
+// const SERVER_IP = "https://dev.biomechservices.com:29007";
+const SERVER_IP = "https://api.coretex.ai";
+
 interface LoginProps {
   setLoginStatus: (status: boolean) => void;
   setRefreshToken: (token: string) => void;
@@ -13,7 +16,7 @@ const Login: FC<LoginProps> = ({ setLoginStatus, setRefreshToken }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('https://dev.biomechservices.com:29007/api/v1/user/login', {}, {
+      const response = await axios.post(`${SERVER_IP}/api/v1/user/login`, {}, {
         auth: { username, password },
       });
       setRefreshToken(response.data.refresh_token);
