@@ -4,20 +4,19 @@ import React, { useState, FC } from 'react';
 import axios from 'axios';
 import { Button, TextField, Paper, Grid, Typography } from '@material-ui/core';
 
-const SERVER_IP = "https://api.coretex.ai";
-
 interface LoginProps {
   setIsLoggedIn: (status: boolean) => void;
   setRefreshToken: (token: string) => void;
+  apiServerURL: string;
 }
 
-const Login: FC<LoginProps> = ({ setIsLoggedIn, setRefreshToken }) => {
+const Login: FC<LoginProps> = ({ setIsLoggedIn, setRefreshToken, apiServerURL }) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(`${SERVER_IP}/api/v1/user/login`, {}, {
+      const response = await axios.post(`${apiServerURL}/api/v1/user/login`, {}, {
         auth: { username, password },
       });
       setRefreshToken(response.data.refresh_token);

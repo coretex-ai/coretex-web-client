@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef, FC } from 'react';
 import Button from '@material-ui/core/Button';
 import CameraAltIcon from '@material-ui/icons/CameraAlt';
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
-import { Input } from '@material-ui/core';
+import { Input, CircularProgress, TextField } from '@material-ui/core';
 import axios from 'axios';
+
 
 interface ImageUploadProps {
     refreshToken: string;
@@ -15,12 +16,11 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
-
-  // Retaining existing states
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [modelID, setModelID] = useState<number>(34);
   const [nodeIP, setNodeIP] = useState<string>("http://130.60.24.196:21000");
-  // const [nodeIP, setNodeIP] = useState<string>("http://192.168.136.138:21000");
+  const [response, setResponse] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileReader = new FileReader();
@@ -66,33 +66,40 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
     if (!image) return;
 
     async function urlToFile(url: string, fileName: string): Promise<File> {
-        // Fetch the blob from the URL
-        const response = await fetch(url);
-        const blob = await response.blob();
+      // Fetch the blob from the URL
+      const response = await fetch(url);
+      const blob = await response.blob();
       
-        // Create a file from the blob
-        const file = new File([blob], fileName, { type: blob.type });
-      
-        return file;
+      // Create a file from the blob
+      return new File([blob], fileName, { type: blob.type });
     };
+
     urlToFile(image, 'example.jpg').then(file => {
-        const formData = new FormData();
-        formData.append('refresh_token', refreshToken);
-        formData.append('image', file);
-    
-        axios.post(`${nodeIP}/invoke/${modelID}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }).then(response => {
-          console.log('Response:', response.data);
-        }).catch(error => {
-          console.error('Detection failed:', error);
-        });
+      const formData = new FormData();
+      formData.append('refresh_token', refreshToken);
+      formData.append('image', file);
+
+      setIsLoading(true); // Start loading
+      axios.post(`${nodeIP}/invoke/${modelID}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }).then(response => {
+        setResponse(JSON.stringify(response.data, null, 2)); // Set response
+        setIsLoading(false); // Stop loading
+      }).catch(error => {
+        setResponse(`Detection failed: ${error.message}`);
+        setIsLoading(false); // Stop loading
       });
+    });
   }, [image]);
 
+  const handleApiServerURLChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNodeIP(event.target.value);
+  };
+
   return (
+    
     <div>
       <Input
         style={{ display: 'none' }}
@@ -100,11 +107,30 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
         type="file"
         onChange={handleCapture}
       />
+<div>
+  <TextField
+    label="<node_ip>:<port>"
+    id-
+    variant="outlined"
+    value={nodeIP}
+    onChange={handleApiServerURLChange}
+    style={{ 
+      marginBottom: '20px'
+    }}
+    InputProps={{
+      style: {
+        color: 'white' // This line ensures the input field itself has a white background
+      }
+    }}
+  />
+</div>
+
       <label htmlFor="raised-button-file">
         <Button variant="contained" color="primary" component="span" startIcon={<PhotoLibraryIcon />}>
           Upload Photo
         </Button>
       </label>
+
 
       {!showCamera && (
         <div>
@@ -130,6 +156,18 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
       <div>
         {image && <img src={image} alt="Captured" style={{ width: '450px', height: '320px', marginTop: '20px' }} />}
       </div>
+
+      {isLoading ? (
+        <div style={{ marginTop: '20px' }}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <textarea
+          value={response}
+          readOnly
+          style={{ width: '450px', height: '200px', marginTop: '20px' }}
+        />
+      )}
     </div>
   );
 };
