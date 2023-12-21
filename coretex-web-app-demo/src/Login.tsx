@@ -19,7 +19,7 @@ const Login: FC<LoginProps> = ({ setIsLoggedIn, setRefreshToken, apiServerURL })
       const response = await axios.post(`${apiServerURL}/api/v1/user/login`, {}, {
         auth: { username, password },
       });
-      setRefreshToken(response.data.refresh_token);
+      setRefreshToken(response.data.token);
       setIsLoggedIn(true);
     } catch (error) {
       console.error('Login failed:', error);

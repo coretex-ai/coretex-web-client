@@ -17,8 +17,9 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
   const photoRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [modelID, setModelID] = useState<number>(34);
-  const [nodeIP, setNodeIP] = useState<string>("http://130.60.24.196:21000");
+  const [modelID, setModelID] = useState<number>(35);
+  const [nodeID, setNodeID] = useState<number>(161);
+  const [nodeIP, setNodeIP] = useState<string>("https://api.coretex.ai");
   const [response, setResponse] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -76,13 +77,14 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
 
     urlToFile(image, 'example.jpg').then(file => {
       const formData = new FormData();
-      formData.append('refresh_token', refreshToken);
+      // formData.append('refresh_token', refreshToken);
       formData.append('image', file);
 
       setIsLoading(true); // Start loading
-      axios.post(`${nodeIP}/invoke/${modelID}`, formData, {
+      axios.post(`${nodeIP}/api/v1/function/invoke/${nodeID}/${modelID}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'api-token': refreshToken,
         },
       }).then(response => {
         setResponse(JSON.stringify(response.data, null, 2)); // Set response
@@ -92,7 +94,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
         setIsLoading(false); // Stop loading
       });
     });
-  }, [image]);
+  }, [image, nodeIP, nodeID, modelID]);
 
   const handleApiServerURLChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNodeIP(event.target.value);
