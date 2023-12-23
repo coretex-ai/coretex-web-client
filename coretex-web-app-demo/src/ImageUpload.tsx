@@ -18,7 +18,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken }) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [modelID, setModelID] = useState<number>(35);
-  const [nodeID, setNodeID] = useState<number>(161);
+  const [nodeID, setNodeID] = useState<number>(164);
   const [nodeIP, setNodeIP] = useState<string>("https://api.coretex.ai");
   const [response, setResponse] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
