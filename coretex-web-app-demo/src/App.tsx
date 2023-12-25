@@ -38,7 +38,7 @@ const App = () => {
         <div className="layout_container">
           <div className="layout_container_header">
             <p className="layout_container_header_title">
-              Coretex Function OCT
+              OCR Model Deployment Demo
             </p>
             <p className="layout_container_header_subtitle">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris
