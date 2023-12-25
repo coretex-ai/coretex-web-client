@@ -1,38 +1,147 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.app_wrapper {
   display: flex;
-  flex-direction: column;
+  height: 100%;
+  background-image: url("./assets/icons/icon_main_background.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+}
+
+.main_content_wrapper {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-left: auto;
+  padding: 20px;
+  background: radial-gradient(
+    50.88% 50.88% at 50.02% 50.88%,
+    #062947 0%,
+    #011424 100%
+  );
+}
+
+.neural_network_img {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 274px;
+  opacity: 0.35;
+}
+
+.ctx_cutted_logo_img {
+  position: absolute;
+  left: 7px;
+  bottom: 9px;
+  opacity: 0.07;
+}
+
+.ctx_words_img {
+  position: absolute;
+  left: 50%;
+  bottom: 45px;
+  transform: translateX(-50%);
+  width: 177px;
+  height: 32px;
+}
+
+.gradient_section {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 542px;
+  height: 230px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #129fee 0%, #145be5 100%);
+  opacity: 0.25;
+  filter: blur(112px);
+}
+
+.layout_container {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: margin-left 0.5s;
+  z-index: 10;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  flex-direction: column;
 }
 
-.App-link {
-  color: #61dafb;
+.layout_container_content_login,
+.layout_container_content_image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 10;
+  box-sizing: border-box;
+  padding: 40px;
+  background-color: rgba(59, 93, 171, 0.2);
+  border: 1px solid #3b5dab;
+  border-radius: 9px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.layout_container_content_login {
+  width: 476px;
+  height: auto;
+}
+
+.layout_container_content_image {
+  min-width: 476px;
+  width: fit-content;
+  min-height: 489px;
+  height: auto;
+}
+
+.field_api_server {
+  width: 100%;
+}
+
+.field_api_server_field {
+  width: 100%;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 500;
   }
-  to {
-    transform: rotate(360deg);
+
+  .MuiInputBase-root {
+    border-radius: 9px;
+    background-color: #fff;
+    font-family: "Cabin";
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 500;
+    color: #083a65;
+    box-sizing: border-box;
+  }
+
+  .MuiInputBase-input::placeholder {
+    color: #083a65;
+  }
+}
+
+.layout_container_header {
+  color: #fff;
+  text-align: center;
+  .layout_container_header_title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 0px;
+  }
+
+  .layout_container_header_subtitle {
+    font-size: 16px;
+    margin-top: 5px;
+    max-width: 476px;
   }
 }

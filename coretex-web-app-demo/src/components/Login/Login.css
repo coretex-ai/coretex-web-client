@@ -1,0 +1,78 @@
+.login_wrapper {
+  width: 100%;
+}
+
+.login_content_wrapper {
+  width: 100%;
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login_btn.MuiButton-root {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 9px;
+  white-space: nowrap;
+  color: #fff;
+  font-family: "Cabin", sans-serif !important;
+  font-size: 24px;
+  line-height: 29px;
+  font-weight: 500;
+  width: 100%;
+  background-color: rgb(30, 135, 201) !important;
+  text-transform: none;
+}
+
+.login_title {
+  font-family: "Cabin", sans-serif;
+  color: #fff;
+  font-size: 24px;
+  line-height: 29px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.login_field .MuiInputBase-root {
+  border-radius: 9px;
+  background-color: #fff;
+  font-family: "Cabin";
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 500;
+  color: #083a65;
+  box-sizing: border-box;
+}
+
+.login_field .MuiInputBase-input::placeholder {
+  color: #083a65;
+}
+
+.login_field .MuiOutlinedInput-notchedOutline,
+.login_field .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: transparent;
+}
+
+.login_field .MuiInputBase-root.Mui-error {
+  border-top-right-radius: 0px;
+}
+
+.login_input_field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 500;
+  }
+}
