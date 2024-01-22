@@ -64,8 +64,8 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           setResponse(JSON.stringify(response.data, null, 2)); // Set response
           setIsLoading(false); // Stop loading
         })
-        .catch((error) => {
-          setResponse(`Detection failed: ${error.message}`);
+        .catch(({ response }) => {
+          setResponse(`Detection failed: ${response.data.message}`);
           setIsLoading(false); // Stop loading
         });
     });

@@ -76,3 +76,10 @@
     font-weight: 500;
   }
 }
+
+.login_error_message {
+  text-align: center;
+  margin: 0;
+  color: #fff;
+  font-weight: bold;
+}

@@ -1,4 +1,4 @@
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import axios from "axios";
 import { Button, TextField } from "@material-ui/core";
 import "./Login.css";
@@ -16,6 +16,7 @@ const Login: FC<LoginProps> = ({
 }) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loginErrorMessage, setLoginErrorMessage] = useState<string>("");
 
   const handleLogin = async () => {
     try {
@@ -28,10 +29,19 @@ const Login: FC<LoginProps> = ({
       );
       setRefreshToken(response.data.token);
       setIsLoggedIn(true);
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      setLoginErrorMessage(
+        error?.response.status === 401
+          ? "Your email or password is incorrect."
+          : ""
+      );
+      console.error("Login failed:", error?.response);
     }
   };
+
+  useEffect(() => {
+    setLoginErrorMessage("");
+  }, [username, password]);
 
   return (
     <div className="login_wrapper">
@@ -59,6 +69,9 @@ const Login: FC<LoginProps> = ({
         <Button className="login_btn" onClick={handleLogin}>
           Sign In
         </Button>
+        {loginErrorMessage && (
+          <p className="login_error_message">{loginErrorMessage}</p>
+        )}
       </div>
     </div>
   );
