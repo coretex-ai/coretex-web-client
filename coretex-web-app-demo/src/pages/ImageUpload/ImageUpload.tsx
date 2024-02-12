@@ -15,7 +15,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const photoRef = useRef<HTMLCanvasElement>(null);
   const fileFieldRef = useRef<HTMLInputElement>(null);
 
-  const [modelID, setModelID] = useState<number>(35);
+  const [modelID, setModelID] = useState<number>(66);
   const [nodeID, setNodeID] = useState<number>(164);
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
