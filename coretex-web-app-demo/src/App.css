@@ -1,6 +1,7 @@
 .app_wrapper {
   display: flex;
-  height: 100%;
+  min-height: 100%;
+  width: 100%;
   background-image: url("./assets/icons/icon_main_background.png");
   background-size: cover;
   background-repeat: no-repeat;
@@ -69,6 +70,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .layout_container_content_login,
@@ -143,5 +145,22 @@
     font-size: 16px;
     margin-top: 5px;
     max-width: 476px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .gradient_section {
+    width: 100%;
+    height: auto;
+  }
+  .layout_container_content_login {
+    width: 100%;
+    padding: 20px;
+  }
+  .layout_container_content_image {
+    min-width: auto;
+    width: 100%;
+    min-height: auto;
+    padding: 20px;
   }
 }

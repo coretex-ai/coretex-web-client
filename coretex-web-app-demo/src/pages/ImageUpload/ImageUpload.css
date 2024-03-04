@@ -1,3 +1,4 @@
+.camera_file_btn.MuiButton-root,
 .upload_file_btn.MuiButton-root {
   color: #fff;
   font-family: "Cabin", sans-serif !important;
@@ -9,6 +10,10 @@
   text-transform: none;
 }
 
+.camera_file_btn.MuiButton-root {
+  margin-top: 10px;
+}
+
 .image_upload_wrapper {
   display: flex;
   width: 100%;
@@ -16,6 +21,16 @@
 
 .image_upload_capture {
   width: 100%;
+
+  video {
+    width: 100%;
+    margin-top: 10px;
+    max-height: 350px;
+  }
+
+  img {
+    width: auto;
+  }
 }
 
 .image_json_wrapper {
@@ -41,6 +56,12 @@
   border-radius: 9px;
 }
 
+.captured_image {
+  width: 450px;
+  height: 320px;
+  margin-top: 20px;
+}
+
 .upload_input_field_wrapper {
   width: 100%;
 }
@@ -64,5 +85,24 @@
 
   :global(.MuiCircularProgress-root) {
     color: #fff;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .image_upload_wrapper {
+    flex-direction: column;
+  }
+
+  .captured_image {
+    width: 100% !important;
+    height: auto;
+  }
+
+  .image_json_wrapper {
+    padding-left: 0px;
+  }
+
+  .image_json_response {
+    width: 100%;
   }
 }

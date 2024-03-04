@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef, FC } from "react";
+import React, { useState, useEffect, useRef, FC, useCallback } from "react";
 import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
+import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import { CircularProgress, TextField } from "@material-ui/core";
 import axios from "axios";
 import "./ImageUpload.css";
+import Webcam from "react-webcam";
 
 interface ImageUploadProps {
   refreshToken: string;
@@ -14,11 +16,13 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const [image, setImage] = useState<string | null>(null);
   const photoRef = useRef<HTMLCanvasElement>(null);
   const fileFieldRef = useRef<HTMLInputElement>(null);
+  const webcamRef = useRef<Webcam>(null);
 
   const [modelID, setModelID] = useState<number>(97);
   const [nodeID, setNodeID] = useState<number>(161);
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
 
   const handleCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileReader = new FileReader();
@@ -75,6 +79,17 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
     if (fileFieldRef.current) fileFieldRef.current.click();
   };
 
+  const handleCameraCaptureImage = useCallback(() => {
+    if (!isCameraEnabled) {
+      setIsCameraEnabled(true);
+      setImage("");
+    } else {
+      const currentImageBase64 = webcamRef.current?.getScreenshot() as string;
+      setImage(currentImageBase64);
+      setIsCameraEnabled(false);
+    }
+  }, [isCameraEnabled]);
+
   return (
     <>
       <div className="image_upload_wrapper">
@@ -116,16 +131,28 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           >
             Upload Photo
           </Button>
+          <Button
+            className="camera_file_btn"
+            onClick={handleCameraCaptureImage}
+            startIcon={<AddAPhotoIcon />}
+          >
+            {isCameraEnabled ? "Capture Photo" : "Camera Photo"}
+          </Button>
+
+          {isCameraEnabled && (
+            <Webcam
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              onUserMedia={() => setIsCameraEnabled(true)}
+              onUserMediaError={() => setIsCameraEnabled(false)}
+            />
+          )}
 
           <canvas ref={photoRef} style={{ display: "none" }} />
 
           <div>
             {image && (
-              <img
-                src={image}
-                alt="Captured"
-                style={{ width: "450px", height: "320px", marginTop: "20px" }}
-              />
+              <img src={image} className="captured_image" alt="Captured" />
             )}
           </div>
         </div>
