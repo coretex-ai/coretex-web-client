@@ -150,11 +150,12 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           {isCameraEnabled && (
             <Webcam
               ref={webcamRef}
-              screenshotFormat="image/jpeg"
               onUserMedia={() => setIsCameraEnabled(true)}
               onUserMediaError={() => setIsCameraEnabled(false)}
               videoConstraints={videoConstraints}
               autoFocus={true}
+              screenshotFormat="image/jpeg"
+              screenshotQuality={1}
             />
           )}
 
