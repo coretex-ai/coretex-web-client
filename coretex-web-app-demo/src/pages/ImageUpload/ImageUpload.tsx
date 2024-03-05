@@ -19,7 +19,12 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const webcamRef = useRef<Webcam>(null);
   const videoConstraints = {
     facingMode: { exact: "environment" },
-  }; // Environment/ Facing-Out camera
+    autoFocus: "continuous",
+    flashMode: "off",
+    whiteBalance: "continuous",
+    zoom: 0,
+    focusDepth: 0,
+  };
 
   const [modelID, setModelID] = useState<number>(97);
   const [nodeID, setNodeID] = useState<number>(161);
@@ -149,6 +154,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
               onUserMedia={() => setIsCameraEnabled(true)}
               onUserMediaError={() => setIsCameraEnabled(false)}
               videoConstraints={videoConstraints}
+              autoFocus={true}
             />
           )}
 
