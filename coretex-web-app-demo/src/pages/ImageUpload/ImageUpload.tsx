@@ -156,6 +156,8 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
               autoFocus={true}
               screenshotFormat="image/jpeg"
               screenshotQuality={1}
+              forceScreenshotSourceSize={true}
+              imageSmoothing={false}
             />
           )}
 
