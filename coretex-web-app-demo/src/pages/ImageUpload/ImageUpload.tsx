@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useRef, FC, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  FC,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -6,6 +13,7 @@ import { CircularProgress, TextField } from "@material-ui/core";
 import axios from "axios";
 import "./ImageUpload.css";
 import Webcam from "react-webcam";
+import { Camera } from "react-camera-pro";
 
 interface ImageUploadProps {
   refreshToken: string;
@@ -14,9 +22,13 @@ interface ImageUploadProps {
 
 const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const [image, setImage] = useState<string | null>(null);
+  const [rectSize, setRectSize] = useState<number | undefined>(undefined);
+
   const photoRef = useRef<HTMLCanvasElement>(null);
   const fileFieldRef = useRef<HTMLInputElement>(null);
-  const webcamRef = useRef<Webcam>(null);
+  const webcamRef = useRef<any>(null);
+  const webCamWrapperRef = useRef<HTMLDivElement | null>(null);
+
   const videoConstraints = {
     facingMode: { ideal: "environment" },
     autoFocus: "continuous",
@@ -98,6 +110,15 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
     }
   }, [isCameraEnabled]);
 
+  useEffect(() => {}, []);
+
+  useLayoutEffect(() => {
+    setRectSize(webCamWrapperRef.current?.clientHeight);
+    console.log(webcamRef.current?.video?.clientHeight);
+  }, [isCameraEnabled]);
+
+  console.log(webcamRef.current?.video?.clientHeight);
+
   return (
     <>
       <div className="image_upload_wrapper">
@@ -148,10 +169,14 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           </Button>
 
           {isCameraEnabled && (
-            <div className="camera_overlay_wrapper">
-              <Webcam
+            <div className="camera_overlay_wrapper" ref={webCamWrapperRef}>
+              {/* <Webcam
                 ref={webcamRef}
-                onUserMedia={() => setIsCameraEnabled(true)}
+                onUserMedia={() => {
+                  setIsCameraEnabled(true);
+                  console.log("ready");
+                  console.log(webcamRef.current?.video?.clientHeight);
+                }}
                 onUserMediaError={() => setIsCameraEnabled(false)}
                 videoConstraints={videoConstraints}
                 autoFocus={true}
@@ -160,10 +185,34 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 forceScreenshotSourceSize={true}
                 imageSmoothing={false}
                 className="camera_first_video"
+              /> */}
+
+              <Camera
+                ref={webCamWrapperRef}
+                aspectRatio="cover"
+                facingMode="environment"
+                errorMessages={{
+                  noCameraAccessible:
+                    "No camera device accessible. Please connect your camera or try a different browser.",
+                  permissionDenied:
+                    "Permission denied. Please refresh and give camera permission.",
+                  switchCamera:
+                    "It is not possible to switch camera to different one because there is only one video device accessible.",
+                  canvas: "Canvas is not supported.",
+                }}
+                videoReadyCallback={() => {
+                  setIsCameraEnabled(true);
+                }}
               />
 
               {/* Rectangle overlay */}
-              <div className="autofocus-container"></div>
+              <div
+                className="autofocus-container"
+                style={{
+                  width: rectSize,
+                  height: rectSize,
+                }}
+              ></div>
             </div>
           )}
 
