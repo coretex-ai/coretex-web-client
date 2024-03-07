@@ -81,6 +81,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   }, [image, nodeID, modelID, refreshToken, apiServerURL]);
 
   const handleClick = () => {
+    setResponse("");
     if (fileFieldRef.current) fileFieldRef.current.click();
   };
 
@@ -88,6 +89,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
     if (!isCameraEnabled) {
       setIsCameraEnabled(true);
       setImage("");
+      setResponse("");
     } else {
       const currentImageBase64 = webcamRef.current?.takePhoto() as string;
       console.log(currentImageBase64);
@@ -105,7 +107,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       }
     })();
   }, []);
-  console.log(devices);
 
   return (
     <>
