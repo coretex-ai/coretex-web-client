@@ -18,7 +18,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const photoRef = useRef<HTMLCanvasElement>(null);
   const fileFieldRef = useRef<HTMLInputElement>(null);
   const webcamRef = useRef<any>(null);
-  const webCamWrapperRef = useRef<HTMLDivElement | null>(null);
 
   const [modelID, setModelID] = useState<number>(97);
   const [nodeID, setNodeID] = useState<number>(161);
@@ -91,6 +90,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       setImage("");
     } else {
       const currentImageBase64 = webcamRef.current?.takePhoto() as string;
+      console.log(currentImageBase64);
       setImage(currentImageBase64);
       setIsCameraEnabled(false);
     }
@@ -105,6 +105,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       }
     })();
   }, []);
+  console.log(devices);
 
   return (
     <>
@@ -169,7 +170,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             </select>
           )}
           {isCameraEnabled && (
-            <div className="camera_overlay_wrapper" ref={webCamWrapperRef}>
+            <div className="camera_overlay_wrapper">
               {/* <Webcam
                 ref={webcamRef}
                 onUserMedia={() => {
@@ -187,7 +188,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 className="camera_first_video"
               /> */}
               <Camera
-                ref={webCamWrapperRef}
+                ref={webcamRef}
                 aspectRatio="cover"
                 facingMode="environment"
                 videoSourceDeviceId={activeDeviceId}
