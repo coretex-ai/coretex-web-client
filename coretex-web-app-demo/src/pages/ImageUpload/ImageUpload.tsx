@@ -90,7 +90,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       setIsCameraEnabled(true);
       setImage("");
     } else {
-      const currentImageBase64 = webcamRef.current?.getScreenshot() as string;
+      const currentImageBase64 = webcamRef.current?.takePhoto() as string;
       setImage(currentImageBase64);
       setIsCameraEnabled(false);
     }
