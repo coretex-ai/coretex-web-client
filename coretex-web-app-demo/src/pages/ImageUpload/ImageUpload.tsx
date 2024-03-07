@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  FC,
-  useCallback,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useEffect, useRef, FC, useCallback } from "react";
 import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -43,6 +36,10 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [activeDeviceId, setActiveDeviceId] = useState<string | undefined>(
+    undefined
+  );
 
   const handleCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileReader = new FileReader();
@@ -110,14 +107,15 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
     }
   }, [isCameraEnabled]);
 
-  useEffect(() => {}, []);
-
-  useLayoutEffect(() => {
-    setRectSize(webCamWrapperRef.current?.clientHeight);
-    console.log(webcamRef.current?.video?.clientHeight);
-  }, [isCameraEnabled]);
-
-  console.log(webcamRef.current?.video?.clientHeight);
+  useEffect(() => {
+    (async () => {
+      if (navigator && navigator.mediaDevices) {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter((i) => i.kind === "videoinput");
+        setDevices(videoDevices);
+      }
+    })();
+  }, []);
 
   return (
     <>
@@ -169,6 +167,19 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           </Button>
 
           {isCameraEnabled && (
+            <select
+              onChange={(event) => {
+                setActiveDeviceId(event.target.value);
+              }}
+            >
+              {devices.map((d) => (
+                <option key={d.deviceId} value={d.deviceId}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+          )}
+          {isCameraEnabled && (
             <div className="camera_overlay_wrapper" ref={webCamWrapperRef}>
               {/* <Webcam
                 ref={webcamRef}
@@ -186,11 +197,11 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 imageSmoothing={false}
                 className="camera_first_video"
               /> */}
-
               <Camera
                 ref={webCamWrapperRef}
                 aspectRatio="cover"
                 facingMode="environment"
+                videoSourceDeviceId={activeDeviceId}
                 errorMessages={{
                   noCameraAccessible:
                     "No camera device accessible. Please connect your camera or try a different browser.",
@@ -206,13 +217,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
               />
 
               {/* Rectangle overlay */}
-              <div
-                className="autofocus-container"
-                style={{
-                  width: rectSize,
-                  height: rectSize,
-                }}
-              ></div>
+              <div className="autofocus-container"></div>
             </div>
           )}
 
