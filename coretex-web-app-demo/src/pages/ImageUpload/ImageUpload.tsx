@@ -5,7 +5,6 @@ import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import { CircularProgress, TextField } from "@material-ui/core";
 import axios from "axios";
 import "./ImageUpload.css";
-import Webcam from "react-webcam";
 import { Camera } from "react-camera-pro";
 
 interface ImageUploadProps {
@@ -15,21 +14,11 @@ interface ImageUploadProps {
 
 const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const [image, setImage] = useState<string | null>(null);
-  const [rectSize, setRectSize] = useState<number | undefined>(undefined);
 
   const photoRef = useRef<HTMLCanvasElement>(null);
   const fileFieldRef = useRef<HTMLInputElement>(null);
   const webcamRef = useRef<any>(null);
   const webCamWrapperRef = useRef<HTMLDivElement | null>(null);
-
-  const videoConstraints = {
-    facingMode: { ideal: "environment" },
-    autoFocus: "continuous",
-    flashMode: "off",
-    whiteBalance: "continuous",
-    zoom: 0,
-    focusDepth: 0,
-  };
 
   const [modelID, setModelID] = useState<number>(97);
   const [nodeID, setNodeID] = useState<number>(161);
