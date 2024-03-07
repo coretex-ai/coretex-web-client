@@ -22,10 +22,9 @@
 .image_upload_capture {
   width: 100%;
 
-  video {
+  .camera_first_video {
     width: 100%;
-    margin-top: 10px;
-    max-height: 350px;
+    height: 100%;
   }
 
   img {
@@ -88,7 +87,42 @@
   }
 }
 
+.camera_overlay_wrapper {
+  position: relative;
+  margin-top: 10px;
+}
+
+.camera_first_video {
+  object-fit: none;
+}
+
+.camera_second_video {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 200px;
+  width: 200px;
+  border: 1px solid yellow;
+  object-fit: none;
+}
+
+.autofocus-container {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(8px);
+}
+
 @media only screen and (max-width: 768px) {
+  .camera_overlay_wrapper {
+    min-height: 230px;
+  }
+  .camera_first_video,
+  .camera_second_video {
+    object-fit: cover;
+  }
+
   .image_upload_wrapper {
     flex-direction: column;
   }

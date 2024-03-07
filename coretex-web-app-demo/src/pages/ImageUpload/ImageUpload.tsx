@@ -148,17 +148,31 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           </Button>
 
           {isCameraEnabled && (
-            <Webcam
-              ref={webcamRef}
-              onUserMedia={() => setIsCameraEnabled(true)}
-              onUserMediaError={() => setIsCameraEnabled(false)}
-              videoConstraints={videoConstraints}
-              autoFocus={true}
-              screenshotFormat="image/jpeg"
-              screenshotQuality={1}
-              forceScreenshotSourceSize={true}
-              imageSmoothing={false}
-            />
+            <div className="camera_overlay_wrapper">
+              <Webcam
+                ref={webcamRef}
+                onUserMedia={() => setIsCameraEnabled(true)}
+                onUserMediaError={() => setIsCameraEnabled(false)}
+                videoConstraints={videoConstraints}
+                autoFocus={true}
+                screenshotFormat="image/jpeg"
+                screenshotQuality={1}
+                forceScreenshotSourceSize={true}
+                imageSmoothing={false}
+                className="camera_first_video"
+              />
+
+              <Webcam
+                className="camera_second_video"
+                videoConstraints={videoConstraints}
+                autoFocus={true}
+                onUserMedia={() => {
+                  console.log(webcamRef.current?.getCanvas());
+                }}
+              />
+              {/* Rectangle overlay */}
+              <div className="autofocus-container"></div>
+            </div>
           )}
 
           <canvas ref={photoRef} style={{ display: "none" }} />
