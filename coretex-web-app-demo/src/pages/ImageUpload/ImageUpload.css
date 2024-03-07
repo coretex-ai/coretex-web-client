@@ -12,6 +12,7 @@
 
 .camera_file_btn.MuiButton-root {
   margin-top: 10px;
+  z-index: 10;
 }
 
 .image_upload_wrapper {
@@ -92,35 +93,28 @@
   margin-top: 10px;
 }
 
-.camera_first_video {
-  object-fit: none;
-}
-
-.camera_second_video {
+.autofocus-container {
   position: absolute;
   z-index: 1;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  height: 200px;
-  width: 200px;
+  height: 230px;
+  width: 230px;
   border: 1px solid yellow;
-  object-fit: none;
-}
-
-.autofocus-container {
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(8px);
+  box-shadow: 0px 0px 120px 120px rgba(0, 0, 0, 0.4);
 }
 
 @media only screen and (max-width: 768px) {
   .camera_overlay_wrapper {
     min-height: 230px;
   }
-  .camera_first_video,
-  .camera_second_video {
-    object-fit: cover;
+
+  .autofocus-container {
+    width: 200px;
+    height: 200px;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 60px 60px rgba(0, 0, 0, 0.4);
   }
 
   .image_upload_wrapper {

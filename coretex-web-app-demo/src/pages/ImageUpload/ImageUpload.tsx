@@ -162,11 +162,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 className="camera_first_video"
               />
 
-              <Webcam
-                className="camera_second_video"
-                videoConstraints={videoConstraints}
-                autoFocus={true}
-              />
               {/* Rectangle overlay */}
               <div className="autofocus-container"></div>
             </div>
