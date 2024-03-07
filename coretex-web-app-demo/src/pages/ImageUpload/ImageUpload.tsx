@@ -18,7 +18,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const fileFieldRef = useRef<HTMLInputElement>(null);
   const webcamRef = useRef<Webcam>(null);
   const videoConstraints = {
-    facingMode: { exact: "environment" },
+    facingMode: { ideal: "environment" },
     autoFocus: "continuous",
     flashMode: "off",
     whiteBalance: "continuous",
@@ -166,9 +166,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 className="camera_second_video"
                 videoConstraints={videoConstraints}
                 autoFocus={true}
-                onUserMedia={() => {
-                  console.log(webcamRef.current?.getCanvas());
-                }}
               />
               {/* Rectangle overlay */}
               <div className="autofocus-container"></div>
