@@ -109,7 +109,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
 
   useEffect(() => {
     (async () => {
-      console.log(navigator);
       if (navigator && navigator.mediaDevices) {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter((i) => i.kind === "videoinput");
@@ -117,8 +116,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       }
     })();
   }, []);
-
-  console.log(devices);
 
   return (
     <>
