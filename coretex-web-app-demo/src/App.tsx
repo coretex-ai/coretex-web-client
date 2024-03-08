@@ -41,10 +41,9 @@ const App = () => {
               OCR Model Deployment Demo
             </p>
             <p className="layout_container_header_subtitle">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris
-              bibendum sapien ac leo viverra, id lobortis felis mattis. Cras
-              vitae lorem nibh. Quisque a pretium erat. Sed dictum pretium enim
-              sed convallis.
+              Web app showcasing integration of Coretex AI Endpoints with React.js frontend.
+              Coretex user can log in and submit an image to a vision model trained on Coretex and preview the inference result.
+              Source code available on https://github.com/coretex-ai/coretex-web-client
             </p>
           </div>
           {!isLoggedIn ? (
