@@ -86,7 +86,7 @@
 .camera_overlay_wrapper {
   position: relative;
   margin-top: 10px;
-  min-height: 230px;
+  min-height: 480px;
 }
 
 .autofocus-container {
@@ -94,11 +94,34 @@
   z-index: 1;
   left: 50%;
   top: 50%;
-  height: 200px;
-  width: 200px;
   transform: translate(-50%, -50%);
   border: 1px solid yellow;
+  box-sizing: border-box;
   box-shadow: 0px 0px 120px 120px rgba(0, 0, 0, 0.4);
+}
+
+.camera_device_wrapper {
+  margin: 10px 0px !important;
+
+  &.MuiFormControl-root {
+    .MuiInputBase-input,
+    .MuiInputLabel-root {
+      color: #fff;
+      font-family: "Cabin";
+    }
+  }
+
+  .MuiInput-underline:before {
+    border-bottom: 1px solid #fff;
+  }
+
+  .MuiInput-underline:after {
+    border-bottom: 2px solid #fff;
+  }
+
+  .MuiSelect-icon {
+    color: #fff;
+  }
 }
 
 @media only screen and (max-width: 768px) {

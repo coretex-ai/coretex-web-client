@@ -1,8 +1,22 @@
-import React, { useState, useEffect, useRef, FC, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  FC,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
-import { CircularProgress, TextField } from "@material-ui/core";
+import {
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
 import axios from "axios";
 import "./ImageUpload.css";
 import { Camera } from "react-camera-pro";
@@ -18,16 +32,19 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const photoRef = useRef<HTMLCanvasElement>(null);
   const fileFieldRef = useRef<HTMLInputElement>(null);
   const webcamRef = useRef<any>(null);
+  const webcamWrapperRef = useRef<HTMLDivElement | null>(null);
 
   const [modelID, setModelID] = useState<number>(97);
   const [nodeID, setNodeID] = useState<number>(161);
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
+  const [isCameraVisible, setIsCameraVisible] = useState<boolean>(false);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [activeDeviceId, setActiveDeviceId] = useState<string | undefined>(
     undefined
   );
+  const [focusSize, setFocusSize] = useState<number>(0);
 
   const handleCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileReader = new FileReader();
@@ -54,7 +71,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
 
     urlToFile(image, "example.jpg").then((file) => {
       const formData = new FormData();
-      // formData.append('refresh_token', refreshToken);
       formData.append("image", file);
 
       setIsLoading(true); // Start loading
@@ -92,9 +108,9 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       setResponse("");
     } else {
       const currentImageBase64 = webcamRef.current?.takePhoto() as string;
-      console.log(currentImageBase64);
       setImage(currentImageBase64);
       setIsCameraEnabled(false);
+      setIsCameraVisible(false);
     }
   }, [isCameraEnabled]);
 
@@ -107,6 +123,17 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       }
     })();
   }, []);
+
+  useLayoutEffect(() => {
+    if (isCameraVisible) {
+      const height = webcamWrapperRef.current?.clientHeight || 0;
+      const width = webcamWrapperRef.current?.clientWidth || 0;
+      executeScroll();
+      setFocusSize(Math.min(height, width));
+    }
+  }, [isCameraVisible]);
+
+  const executeScroll = () => webcamWrapperRef.current?.scrollIntoView();
 
   return (
     <>
@@ -149,45 +176,34 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           >
             Upload Photo
           </Button>
-          <Button
-            className="camera_file_btn"
-            onClick={handleCameraCaptureImage}
-            startIcon={<AddAPhotoIcon />}
-          >
-            {isCameraEnabled ? "Capture Photo" : "Camera Photo"}
-          </Button>
 
           {isCameraEnabled && (
-            <select
-              onChange={(event) => {
-                setActiveDeviceId(event.target.value);
-              }}
-            >
-              {devices.map((d) => (
-                <option key={d.deviceId} value={d.deviceId}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
+            <FormControl fullWidth className="camera_device_wrapper">
+              <InputLabel
+                id="camera-select-label"
+                className="camera_device_label"
+              >
+                Camera Device
+              </InputLabel>
+              <Select
+                labelId="camera-select-label"
+                className="camera_device_select"
+                value={activeDeviceId}
+                label="Age"
+                onChange={(event) => {
+                  setActiveDeviceId(event.target.value as string);
+                }}
+              >
+                {devices.map((d) => (
+                  <MenuItem key={d.deviceId} value={d.deviceId}>
+                    {d.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           )}
           {isCameraEnabled && (
-            <div className="camera_overlay_wrapper">
-              {/* <Webcam
-                ref={webcamRef}
-                onUserMedia={() => {
-                  setIsCameraEnabled(true);
-                  console.log("ready");
-                  console.log(webcamRef.current?.video?.clientHeight);
-                }}
-                onUserMediaError={() => setIsCameraEnabled(false)}
-                videoConstraints={videoConstraints}
-                autoFocus={true}
-                screenshotFormat="image/jpeg"
-                screenshotQuality={1}
-                forceScreenshotSourceSize={true}
-                imageSmoothing={false}
-                className="camera_first_video"
-              /> */}
+            <div className="camera_overlay_wrapper" ref={webcamWrapperRef}>
               <Camera
                 ref={webcamRef}
                 aspectRatio="cover"
@@ -203,14 +219,27 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                   canvas: "Canvas is not supported.",
                 }}
                 videoReadyCallback={() => {
-                  setIsCameraEnabled(true);
+                  setIsCameraVisible(true);
                 }}
               />
 
               {/* Rectangle overlay */}
-              <div className="autofocus-container"></div>
+              {isCameraVisible && (
+                <div
+                  className="autofocus-container"
+                  style={{ width: focusSize, height: focusSize }}
+                ></div>
+              )}
             </div>
           )}
+
+          <Button
+            className="camera_file_btn"
+            onClick={handleCameraCaptureImage}
+            startIcon={<AddAPhotoIcon />}
+          >
+            {isCameraEnabled ? "Capture Photo" : "Camera Photo"}
+          </Button>
 
           <canvas ref={photoRef} style={{ display: "none" }} />
 
