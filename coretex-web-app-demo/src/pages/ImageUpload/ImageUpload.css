@@ -86,7 +86,7 @@
 .camera_overlay_wrapper {
   position: relative;
   margin-top: 10px;
-  min-height: 480px;
+  min-height: 300px;
 }
 
 .autofocus-container {

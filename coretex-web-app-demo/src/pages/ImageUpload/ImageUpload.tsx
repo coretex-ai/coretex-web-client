@@ -206,7 +206,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             <div className="camera_overlay_wrapper" ref={webcamWrapperRef}>
               <Camera
                 ref={webcamRef}
-                aspectRatio="cover"
+                //aspectRatio="cover"
                 facingMode="environment"
                 videoSourceDeviceId={activeDeviceId}
                 errorMessages={{
