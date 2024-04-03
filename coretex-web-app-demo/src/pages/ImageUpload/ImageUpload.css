@@ -22,6 +22,7 @@
 
 .image_upload_capture {
   width: 100%;
+  max-width: 500px;
 
   img {
     width: auto;
@@ -47,8 +48,9 @@
 
 .image_json_response {
   width: 450px;
-  min-height: 200px;
+  min-height: 330px;
   border-radius: 9px;
+  margin-bottom: 20px;
 }
 
 .captured_image {
@@ -143,6 +145,7 @@
     padding-left: 0px;
   }
 
+  .image_json_wrapper img,
   .image_json_response {
     width: 100%;
   }

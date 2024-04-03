@@ -5,6 +5,7 @@ import React, {
   FC,
   useCallback,
   useLayoutEffect,
+  useMemo,
 } from "react";
 import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
@@ -40,6 +41,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const [modelID, setModelID] = useState<number>(159);
   const [nodeID, setNodeID] = useState<number>(317);
   const [response, setResponse] = useState<string>("");
+  const [debugData, setDebugData] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
   const [isCameraVisible, setIsCameraVisible] = useState<boolean>(false);
@@ -60,10 +62,12 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
     };
   };
 
+  const includeDebugData = useMemo(() => {
+    return location.pathname === "/debug";
+  }, [location.pathname]);
+
   useEffect(() => {
     if (!image) return;
-
-    const includeDebugData = location.pathname === "/debug";
 
     async function urlToFile(url: string, fileName: string): Promise<File> {
       // Fetch the blob from the URL
@@ -91,6 +95,11 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           }
         )
         .then((response) => {
+          if (includeDebugData) {
+            setDebugData(response.data.debug);
+            delete response.data.debug;
+          }
+
           setResponse(JSON.stringify(response.data, null, 2)); // Set response
           setIsLoading(false); // Stop loading
         })
@@ -99,7 +108,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           setIsLoading(false); // Stop loading
         });
     });
-  }, [image, nodeID, modelID, refreshToken, apiServerURL, location.pathname]);
+  }, [image, nodeID, modelID, refreshToken, apiServerURL, includeDebugData]);
 
   const handleClick = () => {
     setResponse("");
@@ -266,6 +275,24 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
               className="image_json_response"
               data-testid="model_output_wrapper"
             />
+            {includeDebugData && (
+              <div>
+                <div>
+                  <label>Object Detection</label>
+                  <img
+                    src={`data:image/png;base64,${debugData.objectDetection}`}
+                    alt=""
+                  />
+                </div>
+                <div>
+                  <label>Segmentation</label>
+                  <img
+                    src={`data:image/png;base64,${debugData.segmentation}`}
+                    alt=""
+                  />
+                </div>
+              </div>
+            )}
           </div>
         ) : null}
       </div>
