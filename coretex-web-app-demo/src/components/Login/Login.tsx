@@ -54,6 +54,7 @@ const Login: FC<LoginProps> = ({
             onChange={(e) => setUsername(e.target.value)}
             className="login_field"
             placeholder="Enter your username"
+            data-testid="login_username"
           />
         </div>
         <div className="login_input_field">
@@ -64,9 +65,14 @@ const Login: FC<LoginProps> = ({
             onChange={(e) => setPassword(e.target.value)}
             className="login_field"
             placeholder="Enter your password"
+            data-testid="login_password"
           />
         </div>
-        <Button className="login_btn" onClick={handleLogin}>
+        <Button
+          className="login_btn"
+          onClick={handleLogin}
+          data-testid="login_btn"
+        >
           Sign In
         </Button>
         {loginErrorMessage && (

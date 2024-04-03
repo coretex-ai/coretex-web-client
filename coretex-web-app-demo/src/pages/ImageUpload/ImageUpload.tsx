@@ -20,6 +20,7 @@ import {
 import axios from "axios";
 import "./ImageUpload.css";
 import { Camera } from "react-camera-pro";
+import { useLocation } from "react-router-dom";
 
 interface ImageUploadProps {
   refreshToken: string;
@@ -27,6 +28,8 @@ interface ImageUploadProps {
 }
 
 const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
+  const location = useLocation();
+
   const [image, setImage] = useState<string | null>(null);
 
   const photoRef = useRef<HTMLCanvasElement>(null);
@@ -60,6 +63,8 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   useEffect(() => {
     if (!image) return;
 
+    const includeDebugData = location.pathname === "/debug";
+
     async function urlToFile(url: string, fileName: string): Promise<File> {
       // Fetch the blob from the URL
       const response = await fetch(url);
@@ -77,7 +82,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       axios
         .post(
           `${apiServerURL}/api/v1/function/invoke/${nodeID}/${modelID}`,
-          formData,
+          { image: file, ...(includeDebugData && { debug: true }) },
           {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -94,7 +99,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           setIsLoading(false); // Stop loading
         });
     });
-  }, [image, nodeID, modelID, refreshToken, apiServerURL]);
+  }, [image, nodeID, modelID, refreshToken, apiServerURL, location.pathname]);
 
   const handleClick = () => {
     setResponse("");
@@ -144,6 +149,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             type="file"
             ref={fileFieldRef}
             onChange={handleCapture}
+            data-testid="upload_file_input"
           />
 
           <div className="upload_input_field_wrapper">
@@ -173,6 +179,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             className="upload_file_btn"
             onClick={handleClick}
             startIcon={<PhotoLibraryIcon />}
+            data-testid="upload_photo_btn"
           >
             Upload Photo
           </Button>
@@ -257,6 +264,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
               value={response}
               readOnly
               className="image_json_response"
+              data-testid="model_output_wrapper"
             />
           </div>
         ) : null}
