@@ -275,7 +275,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
               className="image_json_response"
               data-testid="model_output_wrapper"
             />
-            {includeDebugData && (
+            {includeDebugData && debugData && (
               <div>
                 <div>
                   <label>Object Detection</label>
