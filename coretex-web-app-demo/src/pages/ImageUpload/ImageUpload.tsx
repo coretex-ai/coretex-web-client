@@ -11,7 +11,7 @@ import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import {
-  CircularProgress,
+  // CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -32,6 +32,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const location = useLocation();
 
   const [image, setImage] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
 
   const photoRef = useRef<HTMLCanvasElement>(null);
   const fileFieldRef = useRef<HTMLInputElement>(null);
@@ -42,16 +43,17 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const [nodeID, setNodeID] = useState<number>(317);
   const [response, setResponse] = useState<string>("");
   const [debugData, setDebugData] = useState<any>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
   const [isCameraVisible, setIsCameraVisible] = useState<boolean>(false);
+  const [isFileUploadActive, setIsFileUploadActive] = useState<boolean>(false);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [activeDeviceId, setActiveDeviceId] = useState<string | undefined>(
     undefined
   );
   const [focusSize, setFocusSize] = useState<number>(0);
 
-  const handleCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadedImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileReader = new FileReader();
     const file = event.target.files && event.target.files[0];
     fileReader.readAsDataURL(file!);
@@ -60,14 +62,119 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
         setImage(e.target.result);
       }
     };
+    setIsFileUploadActive(true);
   };
 
   const includeDebugData = useMemo(() => {
     return location.pathname === "/debug";
   }, [location.pathname]);
 
+  const captureImage = useCallback(
+    (isCameraActive?: boolean) => {
+      if (!image) return;
+
+      async function urlToFile(url: string, fileName: string): Promise<File> {
+        // Fetch the blob from the URL
+        const response = await fetch(url);
+        const blob = await response.blob();
+
+        // Create a file from the blob
+        return new File([blob], fileName, { type: blob.type });
+      }
+
+      urlToFile(image, "example.jpg").then((file) => {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        //setIsLoading(true); // Start loading
+        axios
+          .post(
+            `${apiServerURL}/api/v1/function/invoke/${nodeID}/${modelID}`,
+            { image: file, ...(includeDebugData && { debug: true }) },
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                "api-token": refreshToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (includeDebugData) {
+              setDebugData(response.data.debug);
+              delete response.data.debug;
+            }
+
+            setProcessedImage(image);
+            setResponse(JSON.stringify(response.data, null, 2)); // Set response
+            // setIsLoading(false); // Stop loading
+          })
+          .catch(({ response }) => {
+            setResponse(response.data.error);
+            // setIsLoading(false); // Stop loading
+
+            if (isCameraActive) {
+              const currentImageBase64 =
+                webcamRef.current?.takePhoto() as string;
+              setImage(currentImageBase64);
+            }
+          });
+
+        if (isFileUploadActive) {
+          setIsFileUploadActive(false);
+        }
+      });
+    },
+    [
+      image,
+      nodeID,
+      modelID,
+      refreshToken,
+      apiServerURL,
+      includeDebugData,
+      isFileUploadActive,
+    ]
+  );
+
+  const handleClick = () => {
+    setIsCameraEnabled(false);
+    setIsCameraVisible(false);
+    setDebugData("");
+    setResponse("");
+    if (fileFieldRef.current) fileFieldRef.current.click();
+  };
+
   useEffect(() => {
-    if (!image) return;
+    (async () => {
+      if (navigator && navigator.mediaDevices) {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter((i) => i.kind === "videoinput");
+        setDevices(videoDevices);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (isFileUploadActive && image) {
+      captureImage();
+    }
+  }, [isFileUploadActive, captureImage, image]);
+
+  useLayoutEffect(() => {
+    if (isCameraVisible) {
+      const height = webcamWrapperRef.current?.clientHeight || 0;
+      const width = webcamWrapperRef.current?.clientWidth || 0;
+      executeScroll();
+      setFocusSize(Math.min(height, width));
+
+      setTimeout(() => {
+        const currentImageBase64 = webcamRef.current?.takePhoto() as string;
+        setImage(currentImageBase64);
+      }, 0);
+    }
+  }, [isCameraVisible]);
+
+  useEffect(() => {
+    if (!image || !isCameraVisible) return;
 
     async function urlToFile(url: string, fileName: string): Promise<File> {
       // Fetch the blob from the URL
@@ -82,7 +189,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      setIsLoading(true); // Start loading
+      // setIsLoading(true); // Start loading
       axios
         .post(
           `${apiServerURL}/api/v1/function/invoke/${nodeID}/${modelID}`,
@@ -100,52 +207,33 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             delete response.data.debug;
           }
 
+          setProcessedImage(image);
           setResponse(JSON.stringify(response.data, null, 2)); // Set response
-          setIsLoading(false); // Stop loading
+          // setIsLoading(false); // Stop loading
         })
         .catch(({ response }) => {
-          setResponse(`Detection failed: ${response.data.message}`);
-          setIsLoading(false); // Stop loading
+          setResponse(response.data.error);
+          // setIsLoading(false); // Stop loading
+
+          if (
+            response.status === 400 &&
+            response.data.error === "Document image quality is low" &&
+            isCameraVisible
+          ) {
+            captureImage(isCameraVisible);
+          }
         });
     });
-  }, [image, nodeID, modelID, refreshToken, apiServerURL, includeDebugData]);
-
-  const handleClick = () => {
-    setResponse("");
-    if (fileFieldRef.current) fileFieldRef.current.click();
-  };
-
-  const handleCameraCaptureImage = useCallback(() => {
-    if (!isCameraEnabled) {
-      setIsCameraEnabled(true);
-      setImage("");
-      setResponse("");
-    } else {
-      const currentImageBase64 = webcamRef.current?.takePhoto() as string;
-      setImage(currentImageBase64);
-      setIsCameraEnabled(false);
-      setIsCameraVisible(false);
-    }
-  }, [isCameraEnabled]);
-
-  useEffect(() => {
-    (async () => {
-      if (navigator && navigator.mediaDevices) {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter((i) => i.kind === "videoinput");
-        setDevices(videoDevices);
-      }
-    })();
-  }, []);
-
-  useLayoutEffect(() => {
-    if (isCameraVisible) {
-      const height = webcamWrapperRef.current?.clientHeight || 0;
-      const width = webcamWrapperRef.current?.clientWidth || 0;
-      executeScroll();
-      setFocusSize(Math.min(height, width));
-    }
-  }, [isCameraVisible]);
+  }, [
+    image,
+    captureImage,
+    isCameraVisible,
+    apiServerURL,
+    includeDebugData,
+    modelID,
+    nodeID,
+    refreshToken,
+  ]);
 
   const executeScroll = () => webcamWrapperRef.current?.scrollIntoView();
 
@@ -157,7 +245,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             style={{ display: "none" }}
             type="file"
             ref={fileFieldRef}
-            onChange={handleCapture}
+            onChange={handleUploadedImage}
             data-testid="upload_file_input"
           />
 
@@ -191,6 +279,14 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             data-testid="upload_photo_btn"
           >
             Upload Photo
+          </Button>
+
+          <Button
+            className="camera_file_btn"
+            onClick={() => setIsCameraEnabled(true)}
+            startIcon={<AddAPhotoIcon />}
+          >
+            Camera Photo
           </Button>
 
           {isCameraEnabled && (
@@ -249,19 +345,15 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             </div>
           )}
 
-          <Button
-            className="camera_file_btn"
-            onClick={handleCameraCaptureImage}
-            startIcon={<AddAPhotoIcon />}
-          >
-            {isCameraEnabled ? "Capture Photo" : "Camera Photo"}
-          </Button>
-
           <canvas ref={photoRef} style={{ display: "none" }} />
 
           <div>
-            {image && (
-              <img src={image} className="captured_image" alt="Captured" />
+            {processedImage && (
+              <img
+                src={processedImage}
+                className="captured_image"
+                alt="Captured"
+              />
             )}
           </div>
         </div>
@@ -293,14 +385,15 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 </div>
               </div>
             )}
+
+            {/* {isLoading ? (
+              <div className="loading">
+                <CircularProgress />
+              </div>
+            ) : null} */}
           </div>
         ) : null}
       </div>
-      {isLoading ? (
-        <div className="loading">
-          <CircularProgress />
-        </div>
-      ) : null}
     </>
   );
 };

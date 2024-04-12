@@ -25,7 +25,7 @@
   max-width: 500px;
 
   img {
-    width: auto;
+    width: 100%;
   }
 }
 
@@ -33,7 +33,9 @@
   display: flex;
   flex-direction: column;
   padding-left: 20px;
+  max-width: 500px;
 }
+
 .image_json_wrapper label,
 .upload_input_field label {
   display: flex;
@@ -44,6 +46,10 @@
   line-height: 19px;
   font-weight: 500;
   padding-bottom: 5px;
+}
+
+.image_json_wrapper img {
+  width: 100%;
 }
 
 .image_json_response {
