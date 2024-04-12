@@ -11,7 +11,7 @@ import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import {
-  // CircularProgress,
+  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -43,7 +43,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const [nodeID, setNodeID] = useState<number>(317);
   const [response, setResponse] = useState<string>("");
   const [debugData, setDebugData] = useState<any>();
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
   const [isCameraVisible, setIsCameraVisible] = useState<boolean>(false);
   const [isFileUploadActive, setIsFileUploadActive] = useState<boolean>(false);
@@ -63,6 +62,14 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       }
     };
     setIsFileUploadActive(true);
+  };
+
+  const activateCameraMode = () => {
+    setIsCameraEnabled(true);
+    setImage("");
+    setProcessedImage("");
+    setResponse("");
+    setDebugData("");
   };
 
   const includeDebugData = useMemo(() => {
@@ -86,7 +93,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
         const formData = new FormData();
         formData.append("image", file);
 
-        //setIsLoading(true); // Start loading
         axios
           .post(
             `${apiServerURL}/api/v1/function/invoke/${nodeID}/${modelID}`,
@@ -106,11 +112,9 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
 
             setProcessedImage(image);
             setResponse(JSON.stringify(response.data, null, 2)); // Set response
-            // setIsLoading(false); // Stop loading
           })
           .catch(({ response }) => {
             setResponse(response.data.error);
-            // setIsLoading(false); // Stop loading
 
             if (isCameraActive) {
               const currentImageBase64 =
@@ -189,7 +193,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      // setIsLoading(true); // Start loading
       axios
         .post(
           `${apiServerURL}/api/v1/function/invoke/${nodeID}/${modelID}`,
@@ -209,11 +212,11 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
 
           setProcessedImage(image);
           setResponse(JSON.stringify(response.data, null, 2)); // Set response
-          // setIsLoading(false); // Stop loading
+          setIsCameraEnabled(false);
+          setIsCameraVisible(false);
         })
         .catch(({ response }) => {
           setResponse(response.data.error);
-          // setIsLoading(false); // Stop loading
 
           if (
             response.status === 400 &&
@@ -283,10 +286,10 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
 
           <Button
             className="camera_file_btn"
-            onClick={() => setIsCameraEnabled(true)}
+            onClick={activateCameraMode}
             startIcon={<AddAPhotoIcon />}
           >
-            Camera Photo
+            Camera
           </Button>
 
           {isCameraEnabled && (
@@ -340,7 +343,9 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 <div
                   className="autofocus-container"
                   style={{ width: focusSize, height: focusSize }}
-                ></div>
+                >
+                  <CircularProgress />
+                </div>
               )}
             </div>
           )}
@@ -385,12 +390,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
                 </div>
               </div>
             )}
-
-            {/* {isLoading ? (
-              <div className="loading">
-                <CircularProgress />
-              </div>
-            ) : null} */}
           </div>
         ) : null}
       </div>
