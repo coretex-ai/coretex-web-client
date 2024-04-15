@@ -114,7 +114,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             setResponse(JSON.stringify(response.data, null, 2)); // Set response
           })
           .catch(({ response }) => {
-            setResponse(response.data.error);
+            setResponse(response.data.message ?? response.data.error);
 
             if (isCameraActive) {
               const currentImageBase64 =
