@@ -39,7 +39,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const webcamRef = useRef<any>(null);
   const webcamWrapperRef = useRef<HTMLDivElement | null>(null);
 
-  const [modelID, setModelID] = useState<number>(175);
+  const [modelID, setModelID] = useState<number>(192);
   const [nodeID, setNodeID] = useState<number>(317);
   const [response, setResponse] = useState<string>("");
   const [debugData, setDebugData] = useState<any>();
