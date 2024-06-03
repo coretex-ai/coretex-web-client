@@ -95,41 +95,7 @@
 .layout_container_content_image {
   min-width: 476px;
   width: fit-content;
-  min-height: 489px;
   height: auto;
-}
-
-.field_api_server {
-  width: 100%;
-}
-
-.field_api_server_field {
-  width: 100%;
-
-  label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: #fff;
-    font-size: 16px;
-    line-height: 19px;
-    font-weight: 500;
-  }
-
-  .MuiInputBase-root {
-    border-radius: 9px;
-    background-color: #fff;
-    font-family: "Cabin";
-    font-size: 18px;
-    line-height: 22px;
-    font-weight: 500;
-    color: #083a65;
-    box-sizing: border-box;
-  }
-
-  .MuiInputBase-input::placeholder {
-    color: #083a65;
-  }
 }
 
 .layout_container_header {

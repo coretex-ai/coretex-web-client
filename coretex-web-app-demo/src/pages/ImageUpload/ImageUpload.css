@@ -36,8 +36,7 @@
   max-width: 500px;
 }
 
-.image_json_wrapper label,
-.upload_input_field label {
+.image_json_wrapper label {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -63,16 +62,6 @@
   width: 450px;
   height: 320px;
   margin-top: 20px;
-}
-
-.upload_input_field_wrapper {
-  width: 100%;
-}
-
-.upload_input_field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
 }
 
 .loading {

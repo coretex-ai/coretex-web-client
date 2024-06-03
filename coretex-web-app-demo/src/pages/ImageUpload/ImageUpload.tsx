@@ -16,19 +16,13 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  TextField,
 } from "@material-ui/core";
 import axios from "axios";
 import "./ImageUpload.css";
 import { Camera } from "react-camera-pro";
 import { useLocation } from "react-router-dom";
 
-interface ImageUploadProps {
-  refreshToken: string;
-  apiServerURL: string;
-}
-
-const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
+const ImageUpload: FC = () => {
   const location = useLocation();
 
   const [image, setImage] = useState<string | null>(null);
@@ -39,8 +33,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
   const webcamRef = useRef<any>(null);
   const webcamWrapperRef = useRef<HTMLDivElement | null>(null);
 
-  const [modelID, setModelID] = useState<number>(175);
-  const [nodeID, setNodeID] = useState<number>(317);
   const [response, setResponse] = useState<string>("");
   const [debugData, setDebugData] = useState<any>();
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
@@ -95,12 +87,13 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
 
         axios
           .post(
-            `${apiServerURL}/api/v1/function/invoke/${nodeID}/${modelID}`,
+            `https://api.coretex.ai/api/v1/endpoint/invoke/ocr-model-deployment-1716881552740`,
             { image: file, ...(includeDebugData && { debug: true }) },
             {
               headers: {
                 "Content-Type": "multipart/form-data",
-                "api-token": refreshToken,
+                "endpoint-token":
+                  "oDim4BDhH3EH5wAnEhl9vO5krdQCVG9BmIKHGugt0yPvxvEEORIXehDIbCNlgI4TkeInXsjzlUQXXf3hx3hkwR2jvw7ZRhUmX2QSexkeFJkSvKwjwSLqz8MFI98uAzo9",
               },
             }
           )
@@ -114,12 +107,14 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             setResponse(JSON.stringify(response.data, null, 2)); // Set response
           })
           .catch(({ response }) => {
-            setResponse(response.data.message ?? response.data.error);
+            if (response) {
+              setResponse(response.data.message ?? response.data.error);
 
-            if (isCameraActive) {
-              const currentImageBase64 =
-                webcamRef.current?.takePhoto() as string;
-              setImage(currentImageBase64);
+              if (isCameraActive) {
+                const currentImageBase64 =
+                  webcamRef.current?.takePhoto() as string;
+                setImage(currentImageBase64);
+              }
             }
           });
 
@@ -128,15 +123,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
         }
       });
     },
-    [
-      image,
-      nodeID,
-      modelID,
-      refreshToken,
-      apiServerURL,
-      includeDebugData,
-      isFileUploadActive,
-    ]
+    [image, includeDebugData, isFileUploadActive]
   );
 
   const handleClick = () => {
@@ -195,12 +182,13 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
 
       axios
         .post(
-          `${apiServerURL}/api/v1/function/invoke/${nodeID}/${modelID}`,
+          `https://api.coretex.ai/api/v1/endpoint/invoke/ocr-model-deployment-1716881552740`,
           { image: file, ...(includeDebugData && { debug: true }) },
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              "api-token": refreshToken,
+              "endpoint-token":
+                "oDim4BDhH3EH5wAnEhl9vO5krdQCVG9BmIKHGugt0yPvxvEEORIXehDIbCNlgI4TkeInXsjzlUQXXf3hx3hkwR2jvw7ZRhUmX2QSexkeFJkSvKwjwSLqz8MFI98uAzo9",
             },
           }
         )
@@ -227,16 +215,7 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
           }
         });
     });
-  }, [
-    image,
-    captureImage,
-    isCameraVisible,
-    apiServerURL,
-    includeDebugData,
-    modelID,
-    nodeID,
-    refreshToken,
-  ]);
+  }, [image, captureImage, isCameraVisible, includeDebugData]);
 
   const executeScroll = () => webcamWrapperRef.current?.scrollIntoView();
 
@@ -251,29 +230,6 @@ const ImageUpload: FC<ImageUploadProps> = ({ refreshToken, apiServerURL }) => {
             onChange={handleUploadedImage}
             data-testid="upload_file_input"
           />
-
-          <div className="upload_input_field_wrapper">
-            <div className="upload_input_field">
-              <label>Node ID</label>
-              <TextField
-                variant="outlined"
-                onChange={(e) => setNodeID(Number(e.target.value))}
-                value={nodeID}
-                className="login_field"
-                placeholder="Enter your node ID"
-              />
-            </div>
-            <div className="upload_input_field">
-              <label>Model ID</label>
-              <TextField
-                variant="outlined"
-                onChange={(e) => setModelID(Number(e.target.value))}
-                value={modelID}
-                className="login_field"
-                placeholder="Enter your model ID"
-              />
-            </div>
-          </div>
 
           <Button
             className="upload_file_btn"

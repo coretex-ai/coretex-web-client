@@ -1,7 +1,4 @@
-import React, { useState } from "react";
-import TextField from "@material-ui/core/TextField";
 import "./App.css";
-import Login from "./components/Login/Login"; // Import the Login component
 import ImageUpload from "./pages/ImageUpload/ImageUpload"; // Import the ImageUpload component
 
 import ctxCuttedLogo from "./assets/images/ctx_cutted_logo.svg";
@@ -9,16 +6,6 @@ import neuralNetworkImg from "./assets/images/neural_network.svg";
 import ctxWordsImg from "./assets/images/ctx_words.svg";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [refreshToken, setRefreshToken] = useState("");
-  const [apiServerURL, setApiServerURL] = useState("https://api.coretex.ai");
-
-  const handleApiServerURLChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setApiServerURL(event.target.value);
-  };
-
   return (
     <div className="app_wrapper">
       <main className="main_content_wrapper">
@@ -41,36 +28,17 @@ const App = () => {
               OCR Model Deployment Demo
             </p>
             <p className="layout_container_header_subtitle">
-              Web app showcasing integration of Coretex AI Endpoints with React.js frontend.
-              Coretex user can log in and submit an image to a vision model trained on Coretex and preview the inference result.
-              Source code available on https://github.com/coretex-ai/coretex-web-client
+              Web app showcasing integration of Coretex AI Endpoints with
+              React.js frontend. Coretex user can log in and submit an image to
+              a vision model trained on Coretex and preview the inference
+              result. Source code available on
+              https://github.com/coretex-ai/coretex-web-client
             </p>
           </div>
-          {!isLoggedIn ? (
-            <div className="layout_container_content_login">
-              <div className="field_api_server_field">
-                <label>API Server URL</label>
-                <TextField
-                  variant="outlined"
-                  value={apiServerURL}
-                  onChange={handleApiServerURLChange}
-                  className="field_api_server"
-                />
-              </div>
-              <Login
-                setIsLoggedIn={setIsLoggedIn}
-                setRefreshToken={setRefreshToken}
-                apiServerURL={apiServerURL}
-              />
-            </div>
-          ) : (
-            <div className="layout_container_content_image">
-              <ImageUpload
-                refreshToken={refreshToken}
-                apiServerURL={apiServerURL}
-              />
-            </div>
-          )}
+          <div className="layout_container_content_image">
+            <ImageUpload />
+          </div>
+          {/* )} */}
         </div>
       </main>
     </div>
