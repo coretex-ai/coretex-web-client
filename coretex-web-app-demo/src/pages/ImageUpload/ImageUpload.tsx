@@ -206,11 +206,7 @@ const ImageUpload: FC = () => {
         .catch(({ response }) => {
           setResponse(response.data.error);
 
-          if (
-            response.status === 400 &&
-            response.data.error === "Document image quality is low" &&
-            isCameraVisible
-          ) {
+          if (response.data.error && isCameraVisible) {
             captureImage(isCameraVisible);
           }
         });
