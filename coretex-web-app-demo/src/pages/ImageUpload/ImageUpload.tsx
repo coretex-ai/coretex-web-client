@@ -206,7 +206,7 @@ const ImageUpload: FC = () => {
         .catch(({ response }) => {
           setResponse(response.data.error);
 
-          if (response.data.error && isCameraVisible) {
+          if (isCameraVisible) {
             captureImage(isCameraVisible);
           }
         });
