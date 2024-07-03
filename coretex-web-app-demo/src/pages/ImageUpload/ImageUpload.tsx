@@ -87,13 +87,13 @@ const ImageUpload: FC = () => {
 
         axios
           .post(
-            `https://api.coretex.ai/api/v1/endpoint/invoke/ocr-model-deployment-1716881552740`,
+            `https://api.coretex.ai/api/v1/endpoint/invoke/3057-digitopsy-internvl-ep`,
             { image: file, ...(includeDebugData && { debug: true }) },
             {
               headers: {
                 "Content-Type": "multipart/form-data",
                 "endpoint-token":
-                  "oDim4BDhH3EH5wAnEhl9vO5krdQCVG9BmIKHGugt0yPvxvEEORIXehDIbCNlgI4TkeInXsjzlUQXXf3hx3hkwR2jvw7ZRhUmX2QSexkeFJkSvKwjwSLqz8MFI98uAzo9",
+                  "0tRx9Tn9LHTHLnXoesrLdYkGrzFMwuEO2tg6NZsUePHV9fs5Ad4Po4HlT2xOzvGhHdlJgTrm7mAH7SezWAW1Dj8E12uFijdCu1rdNGYy0o7hDr7iQqXyGbiiO448CHNJ",
               },
             }
           )
@@ -182,13 +182,13 @@ const ImageUpload: FC = () => {
 
       axios
         .post(
-          `https://api.coretex.ai/api/v1/endpoint/invoke/ocr-model-deployment-1716881552740`,
+          `https://api.coretex.ai/api/v1/endpoint/invoke/3057-digitopsy-internvl-ep`,
           { image: file, ...(includeDebugData && { debug: true }) },
           {
             headers: {
               "Content-Type": "multipart/form-data",
               "endpoint-token":
-                "oDim4BDhH3EH5wAnEhl9vO5krdQCVG9BmIKHGugt0yPvxvEEORIXehDIbCNlgI4TkeInXsjzlUQXXf3hx3hkwR2jvw7ZRhUmX2QSexkeFJkSvKwjwSLqz8MFI98uAzo9",
+                "0tRx9Tn9LHTHLnXoesrLdYkGrzFMwuEO2tg6NZsUePHV9fs5Ad4Po4HlT2xOzvGhHdlJgTrm7mAH7SezWAW1Dj8E12uFijdCu1rdNGYy0o7hDr7iQqXyGbiiO448CHNJ",
             },
           }
         )
