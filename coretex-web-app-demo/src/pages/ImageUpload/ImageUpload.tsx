@@ -68,18 +68,38 @@ const ImageUpload: FC = () => {
     return location.pathname === "/debug";
   }, [location.pathname]);
 
+  async function urlToFile(url: string, fileName: string): Promise<File> {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => {
+      const clientWidth = img.width;
+      const clientHeight = img.height;
+      const aspectRatio = clientWidth / clientHeight;
+
+      let scaledWidth: number | undefined, scaledHeight: number | undefined;
+
+      if (aspectRatio > 1) {
+        scaledHeight = 640;
+        scaledWidth = 640 * aspectRatio;
+      } else {
+        scaledWidth = 640;
+        scaledHeight = 640 * aspectRatio;
+      }
+
+      img.width = scaledWidth;
+      img.height = scaledHeight;
+    };
+
+    const response = await fetch(img.src);
+    const blob = await response.blob();
+
+    // Create a file from the blob
+    return new File([blob], fileName, { type: blob.type });
+  }
+
   const captureImage = useCallback(
     (isCameraActive?: boolean) => {
       if (!image) return;
-
-      async function urlToFile(url: string, fileName: string): Promise<File> {
-        // Fetch the blob from the URL
-        const response = await fetch(url);
-        const blob = await response.blob();
-
-        // Create a file from the blob
-        return new File([blob], fileName, { type: blob.type });
-      }
 
       urlToFile(image, "example.jpg").then((file) => {
         const formData = new FormData();
@@ -166,15 +186,6 @@ const ImageUpload: FC = () => {
 
   useEffect(() => {
     if (!image || !isCameraVisible) return;
-
-    async function urlToFile(url: string, fileName: string): Promise<File> {
-      // Fetch the blob from the URL
-      const response = await fetch(url);
-      const blob = await response.blob();
-
-      // Create a file from the blob
-      return new File([blob], fileName, { type: blob.type });
-    }
 
     urlToFile(image, "example.jpg").then((file) => {
       const formData = new FormData();
