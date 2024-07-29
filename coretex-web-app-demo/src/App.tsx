@@ -1,9 +1,9 @@
 import "./App.css";
-import ImageUpload from "./pages/ImageUpload/ImageUpload"; // Import the ImageUpload component
+import ImageUpload from "pages/ImageUpload/ImageUpload"; // Import the ImageUpload component
 
-import ctxCuttedLogo from "./assets/images/ctx_cutted_logo.svg";
-import neuralNetworkImg from "./assets/images/neural_network.svg";
-import ctxWordsImg from "./assets/images/ctx_words.svg";
+import ctxCuttedLogo from "assets/images/ctx_cutted_logo.svg";
+import neuralNetworkImg from "assets/images/neural_network.svg";
+import ctxWordsImg from "assets/images/ctx_words.svg";
 
 const App = () => {
   return (
@@ -38,7 +38,6 @@ const App = () => {
           <div className="layout_container_content_image">
             <ImageUpload />
           </div>
-          {/* )} */}
         </div>
       </main>
     </div>

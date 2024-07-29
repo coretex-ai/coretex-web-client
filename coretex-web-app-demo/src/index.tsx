@@ -13,7 +13,6 @@ root.render(
     <React.StrictMode>
       <Routes>
         <Route path="" element={<App />} />
-        <Route path="/debug" element={<App />} />
       </Routes>
     </React.StrictMode>
   </BrowserRouter>

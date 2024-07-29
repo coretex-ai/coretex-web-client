@@ -5,7 +5,6 @@ import React, {
   FC,
   useCallback,
   useLayoutEffect,
-  useMemo,
 } from "react";
 import Button from "@material-ui/core/Button";
 import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
@@ -17,13 +16,16 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
-import axios from "axios";
-import "./ImageUpload.css";
 import { Camera } from "react-camera-pro";
-import { useLocation } from "react-router-dom";
+import { IDebugData } from "interfaces/Debug";
+import { zipFiles } from "helpers/ZipHelper";
+import { DigitopsyService } from "services/DigitopsyService";
+import { useSnackbar } from "hooks/useSnackbar";
+import Snackbar from "components/Snackbar/Snackbar";
+import "./ImageUpload.css";
 
 const ImageUpload: FC = () => {
-  const location = useLocation();
+  const { snackbar, onSetSnackbar } = useSnackbar();
 
   const [image, setImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -34,7 +36,7 @@ const ImageUpload: FC = () => {
   const webcamWrapperRef = useRef<HTMLDivElement | null>(null);
 
   const [response, setResponse] = useState<string>("");
-  const [debugData, setDebugData] = useState<any>();
+  const [debugData, setDebugData] = useState<IDebugData>();
   const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(false);
   const [isCameraVisible, setIsCameraVisible] = useState<boolean>(false);
   const [isFileUploadActive, setIsFileUploadActive] = useState<boolean>(false);
@@ -43,6 +45,11 @@ const ImageUpload: FC = () => {
     undefined
   );
   const [focusSize, setFocusSize] = useState<number>(0);
+  const [submitInProgress, setSubmitInProgress] = useState<boolean>(false);
+
+  const base64ToSrc = (base64: string): string => {
+    return `data:image/png;base64,${base64}`;
+  };
 
   const handleUploadedImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileReader = new FileReader();
@@ -61,12 +68,8 @@ const ImageUpload: FC = () => {
     setImage("");
     setProcessedImage("");
     setResponse("");
-    setDebugData("");
+    setDebugData(undefined);
   };
-
-  const includeDebugData = useMemo(() => {
-    return location.pathname === "/debug";
-  }, [location.pathname]);
 
   async function urlToFile(url: string, fileName: string): Promise<File> {
     const img = new Image();
@@ -102,26 +105,10 @@ const ImageUpload: FC = () => {
       if (!image) return;
 
       urlToFile(image, "example.jpg").then((file) => {
-        const formData = new FormData();
-        formData.append("image", file);
-
-        axios
-          .post(
-            `https://api.coretex.ai/api/v1/endpoint/invoke/3057-digitopsy-internvl-ep`,
-            { image: file, ...(includeDebugData && { debug: true }) },
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                "endpoint-token":
-                  "0tRx9Tn9LHTHLnXoesrLdYkGrzFMwuEO2tg6NZsUePHV9fs5Ad4Po4HlT2xOzvGhHdlJgTrm7mAH7SezWAW1Dj8E12uFijdCu1rdNGYy0o7hDr7iQqXyGbiiO448CHNJ",
-              },
-            }
-          )
+        DigitopsyService.invoke(file)
           .then((response) => {
-            if (includeDebugData) {
-              setDebugData(response.data.debug);
-              delete response.data.debug;
-            }
+            setDebugData(response.data.debug);
+            delete response.data.debug;
 
             setProcessedImage(image);
             setResponse(JSON.stringify(response.data, null, 2)); // Set response
@@ -143,13 +130,13 @@ const ImageUpload: FC = () => {
         }
       });
     },
-    [image, includeDebugData, isFileUploadActive]
+    [image, isFileUploadActive]
   );
 
   const handleClick = () => {
     setIsCameraEnabled(false);
     setIsCameraVisible(false);
-    setDebugData("");
+    setDebugData(undefined);
     setResponse("");
     if (fileFieldRef.current) fileFieldRef.current.click();
   };
@@ -188,26 +175,10 @@ const ImageUpload: FC = () => {
     if (!image || !isCameraVisible) return;
 
     urlToFile(image, "example.jpg").then((file) => {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      axios
-        .post(
-          `https://api.coretex.ai/api/v1/endpoint/invoke/3057-digitopsy-internvl-ep`,
-          { image: file, ...(includeDebugData && { debug: true }) },
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              "endpoint-token":
-                "0tRx9Tn9LHTHLnXoesrLdYkGrzFMwuEO2tg6NZsUePHV9fs5Ad4Po4HlT2xOzvGhHdlJgTrm7mAH7SezWAW1Dj8E12uFijdCu1rdNGYy0o7hDr7iQqXyGbiiO448CHNJ",
-            },
-          }
-        )
+      DigitopsyService.invoke(file)
         .then((response) => {
-          if (includeDebugData) {
-            setDebugData(response.data.debug);
-            delete response.data.debug;
-          }
+          setDebugData(response.data.debug);
+          delete response.data.debug;
 
           setProcessedImage(image);
           setResponse(JSON.stringify(response.data, null, 2)); // Set response
@@ -222,9 +193,50 @@ const ImageUpload: FC = () => {
           }
         });
     });
-  }, [image, captureImage, isCameraVisible, includeDebugData]);
+  }, [image, captureImage, isCameraVisible]);
 
   const executeScroll = () => webcamWrapperRef.current?.scrollIntoView();
+
+  const handleSubmitData = () => {
+    if (!response || !image) return;
+
+    setSubmitInProgress(true);
+
+    const outputFile = new File([new Blob([response])], "output.txt");
+
+    const filePromises = [
+      urlToFile(image, "input.png"),
+      ...(debugData
+        ? [
+            urlToFile(
+              base64ToSrc(debugData.objectDetection),
+              "object_detection.png"
+            ),
+            urlToFile(base64ToSrc(debugData.segmentation), "segmentation.png"),
+          ]
+        : []),
+    ];
+
+    Promise.all(filePromises)
+      .then((imageFiles) => {
+        const files = [outputFile, ...imageFiles];
+        return zipFiles(files, "debug_file.zip");
+      })
+      .then((zip) => DigitopsyService.submitDataForAnalysis(zip))
+      .then(() =>
+        onSetSnackbar({
+          severity: "success",
+          message: "Data submitted successfully.",
+        })
+      )
+      .catch(() =>
+        onSetSnackbar({
+          severity: "error",
+          message: "Something went wrong while submitting data.",
+        })
+      )
+      .finally(() => setSubmitInProgress(false));
+  };
 
   return (
     <>
@@ -324,6 +336,18 @@ const ImageUpload: FC = () => {
               />
             )}
           </div>
+          {response && (
+            <Button
+              disabled={submitInProgress}
+              className="submit_data_btn"
+              onClick={handleSubmitData}
+              startIcon={
+                submitInProgress ? <CircularProgress size={15} /> : undefined
+              }
+            >
+              Submit data for the analysis
+            </Button>
+          )}
         </div>
 
         {response ? (
@@ -335,27 +359,24 @@ const ImageUpload: FC = () => {
               className="image_json_response"
               data-testid="model_output_wrapper"
             />
-            {includeDebugData && debugData && (
+
+            {debugData && (
               <div>
                 <div>
                   <label>Object Detection</label>
-                  <img
-                    src={`data:image/png;base64,${debugData.objectDetection}`}
-                    alt=""
-                  />
+                  <img src={base64ToSrc(debugData.objectDetection)} alt="" />
                 </div>
                 <div>
                   <label>Segmentation</label>
-                  <img
-                    src={`data:image/png;base64,${debugData.segmentation}`}
-                    alt=""
-                  />
+                  <img src={base64ToSrc(debugData.segmentation)} alt="" />
                 </div>
               </div>
             )}
           </div>
         ) : null}
       </div>
+
+      <Snackbar {...snackbar} />
     </>
   );
 };

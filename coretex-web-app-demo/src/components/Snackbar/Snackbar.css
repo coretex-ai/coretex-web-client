@@ -1,0 +1,43 @@
+.snackbar_wrapper {
+  position: fixed;
+  bottom: auto;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.snackbar_wrapper .MuiSnackbar-root {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+}
+
+.snackbar_wrapper .MuiSnackbar-root .MuiPaper-root {
+  z-index: 20;
+  min-width: unset;
+  padding: 10px;
+  border-radius: 6px;
+  color: #363d49;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 500;
+  font-family: "Cabin", sans-serif;
+}
+
+.snackbar_wrapper .MuiSnackbar-root .MuiPaper-root .MuiSnackbarContent-message {
+  padding: 0px;
+  text-align: center;
+}
+
+.snackbar_wrapper.success .MuiSnackbar-root .MuiPaper-root {
+  border: 1px solid #017f5b;
+  background-color: #c3dce0;
+}
+
+.snackbar_wrapper.error .MuiSnackbar-root .MuiPaper-root {
+  border: 1px solid #de1d42;
+  background-color: #ded2de;
+}

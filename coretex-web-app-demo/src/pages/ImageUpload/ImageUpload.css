@@ -1,5 +1,6 @@
 .camera_file_btn.MuiButton-root,
-.upload_file_btn.MuiButton-root {
+.upload_file_btn.MuiButton-root,
+.submit_data_btn.MuiButton-root {
   color: #fff;
   font-family: "Cabin", sans-serif !important;
   font-size: 24px;
@@ -13,6 +14,19 @@
 .camera_file_btn.MuiButton-root {
   margin-top: 10px;
   z-index: 10;
+}
+
+.submit_data_btn.MuiButton-root {
+  margin-block: 10px;
+}
+
+.submit_data_btn.MuiButton-root.Mui-disabled {
+  opacity: 0.5;
+  color: #fff;
+}
+
+.submit_data_btn.MuiButton-root .MuiCircularProgress-root {
+  color: #fff;
 }
 
 .image_upload_wrapper {
@@ -131,6 +145,13 @@
 }
 
 @media only screen and (max-width: 768px) {
+  .camera_file_btn.MuiButton-root,
+  .upload_file_btn.MuiButton-root,
+  .submit_data_btn.MuiButton-root {
+    font-size: 18px;
+    line-height: 21px;
+  }
+
   .autofocus-container {
     box-sizing: border-box;
     box-shadow: 0px 0px 60px 60px rgba(0, 0, 0, 0.4);
