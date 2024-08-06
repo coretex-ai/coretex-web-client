@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 import { Camera } from "react-camera-pro";
 import { IDebugData } from "interfaces/Debug";
-import { zipFiles } from "helpers/ZipHelper";
+import { gzipFile, zipFiles } from "helpers/ZipHelper";
 import { DigitopsyService } from "services/DigitopsyService";
 import { useSnackbar } from "hooks/useSnackbar";
 import Snackbar from "components/Snackbar/Snackbar";
@@ -104,33 +104,41 @@ const ImageUpload: FC = () => {
     (isCameraActive?: boolean) => {
       if (!image) return;
 
-      urlToFile(image, "example.jpg").then((file) => {
-        DigitopsyService.invoke(file)
-          .then((response) => {
-            setDebugData(response.data.debug);
-            delete response.data.debug;
+      urlToFile(image, "example.jpg")
+        .then((file) => gzipFile(file))
+        .then((gzipFile) => {
+          DigitopsyService.invoke(gzipFile)
+            .then((response) => {
+              setDebugData(response.data.debug);
+              delete response.data.debug;
 
-            setProcessedImage(image);
-            setResponse(JSON.stringify(response.data, null, 2)); // Set response
-          })
-          .catch(({ response }) => {
-            if (response) {
-              setResponse(response.data.message ?? response.data.error);
+              setProcessedImage(image);
+              setResponse(JSON.stringify(response.data, null, 2)); // Set response
+            })
+            .catch(({ response }) => {
+              if (response) {
+                setResponse(response.data.message ?? response.data.error);
 
-              if (isCameraActive) {
-                const currentImageBase64 =
-                  webcamRef.current?.takePhoto() as string;
-                setImage(currentImageBase64);
+                if (isCameraActive) {
+                  const currentImageBase64 =
+                    webcamRef.current?.takePhoto() as string;
+                  setImage(currentImageBase64);
+                }
               }
-            }
-          });
+            });
 
-        if (isFileUploadActive) {
-          setIsFileUploadActive(false);
-        }
-      });
+          if (isFileUploadActive) {
+            setIsFileUploadActive(false);
+          }
+        })
+        .catch(() =>
+          onSetSnackbar({
+            severity: "error",
+            message: "Something went wrong while gzipping image.",
+          })
+        );
     },
-    [image, isFileUploadActive]
+    [image, isFileUploadActive, onSetSnackbar]
   );
 
   const handleClick = () => {
@@ -174,26 +182,34 @@ const ImageUpload: FC = () => {
   useEffect(() => {
     if (!image || !isCameraVisible) return;
 
-    urlToFile(image, "example.jpg").then((file) => {
-      DigitopsyService.invoke(file)
-        .then((response) => {
-          setDebugData(response.data.debug);
-          delete response.data.debug;
+    urlToFile(image, "example.jpg")
+      .then((file) => gzipFile(file))
+      .then((gzipFile) => {
+        DigitopsyService.invoke(gzipFile)
+          .then((response) => {
+            setDebugData(response.data.debug);
+            delete response.data.debug;
 
-          setProcessedImage(image);
-          setResponse(JSON.stringify(response.data, null, 2)); // Set response
-          setIsCameraEnabled(false);
-          setIsCameraVisible(false);
+            setProcessedImage(image);
+            setResponse(JSON.stringify(response.data, null, 2)); // Set response
+            setIsCameraEnabled(false);
+            setIsCameraVisible(false);
+          })
+          .catch(({ response }) => {
+            setResponse(response.data.error);
+
+            if (isCameraVisible) {
+              captureImage(isCameraVisible);
+            }
+          });
+      })
+      .catch(() =>
+        onSetSnackbar({
+          severity: "error",
+          message: "Something went wrong while gzipping image.",
         })
-        .catch(({ response }) => {
-          setResponse(response.data.error);
-
-          if (isCameraVisible) {
-            captureImage(isCameraVisible);
-          }
-        });
-    });
-  }, [image, captureImage, isCameraVisible]);
+      );
+  }, [image, captureImage, isCameraVisible, onSetSnackbar]);
 
   const executeScroll = () => webcamWrapperRef.current?.scrollIntoView();
 

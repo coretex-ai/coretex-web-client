@@ -1,4 +1,9 @@
-import { AsyncZippable, zip } from "fflate";
+import { AsyncZippable, zip, gzip } from "fflate";
+
+enum MimeTypes {
+  Zip = "application/zip",
+  Gzip = "application/gzip",
+}
 
 export const zipFiles = (files: File[], zipName: string): Promise<File> => {
   return new Promise((resolve, reject) => {
@@ -18,7 +23,7 @@ export const zipFiles = (files: File[], zipName: string): Promise<File> => {
             return;
           } else {
             const zipFile = new File([data], zipName, {
-              type: "application/zip",
+              type: MimeTypes.Zip,
             });
 
             resolve(zipFile);
@@ -28,5 +33,29 @@ export const zipFiles = (files: File[], zipName: string): Promise<File> => {
       .catch((error) => {
         reject(error);
       });
+  });
+};
+
+export const gzipFile = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    file
+      .arrayBuffer()
+      .then((arrayBuffer) => {
+        const arrayData = new Uint8Array(arrayBuffer);
+
+        gzip(arrayData, { consume: true, mem: 0, level: 0 }, (error, data) => {
+          if (error) {
+            reject(error);
+            return;
+          } else {
+            const gzipFile = new File([data], `${file.name}.gz`, {
+              type: MimeTypes.Gzip,
+            });
+
+            resolve(gzipFile);
+          }
+        });
+      })
+      .catch((error) => reject(error));
   });
 };
